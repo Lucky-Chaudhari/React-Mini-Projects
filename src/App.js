@@ -1,25 +1,64 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from "react";
+import Navbar from  "./components/Navbar";
+import Cards from "./components/Cards";
+import Filter from "./components/Filter";
+import { apiUrl, filterData  } from "./data";
+import { toast } from "react-toastify";
+import Spinner from "./components/Spinner";
+// import { useState,useEffect } from "react";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+
+
+const App = () => {
+ const [courses, setCourses]=useState(null);
+ const [loading,setLoading]=useState(true);
+ const [category,setCategory] = useState (filterData[0].title);
+
+async function fetchData() {
+
+  setLoading(true)
+  try{
+    let response = await fetch(apiUrl);
+    let output = await response.json();
+
+    setCourses(output.data)
+  }catch{
+    toast.error("Network me koi dikkat hai");
+  }
+  setLoading(false);
 }
+
+useEffect (()=>{
+  fetchData();
+},[])
+   return (
+<div className="flex flex-col min-h-screen bg-bgDark2">
+  <div>
+    <Navbar/>
+  </div>
+
+
+  <div className="">
+
+<div>
+    <Filter  filterData = {filterData}
+      setCategory={setCategory}
+      category ={category}
+    />
+  </div>
+  <div className="w-11/12 max-w-[1200px] mx-auto flex justify-center items-center min-h-[50vh] flex-wrap">
+   {
+    loading ? (<Spinner/>) : (<Cards  courses={courses}
+      category ={category}
+    />)
+   }
+  </div>
+
+
+  </div>
+
+</div>
+   );
+};
 
 export default App;
